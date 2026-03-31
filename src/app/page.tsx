@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 interface Operario {
   id: number;
@@ -83,6 +83,15 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
+  const fechaHoy = useMemo(() => {
+    return new Date().toLocaleDateString("es-ES", {
+      weekday: "long",
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+  }, []);
+
   const [selectedTarea, setSelectedTarea] = useState<string>("");
   const [tieneAyudante, setTieneAyudante] = useState(false);
   const [form, setForm] = useState({
@@ -119,6 +128,33 @@ export default function Home() {
   useEffect(() => {
     loadTrabajos();
   }, [loadTrabajos]);
+
+  const exportarExcel = () => {
+    if (trabajos.length === 0) return;
+    const headers = ["Operario", "Trabajo", "Código", "Vehículo", "Tiempo", "Ayudante", "Horas Ayudante", "Observaciones", "Fecha"];
+    const rows = trabajos.map((t) => [
+      t.operario,
+      t.trabajo,
+      t.codigo,
+      t.vehiculo,
+      t.tiempo,
+      t.tiene_ayudante ? t.ayudante : "No",
+      t.tiene_ayudante ? t.horas_ayudante : "",
+      t.observaciones,
+      new Date(t.created_at).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }),
+    ]);
+    const csvContent = [headers, ...rows]
+      .map((row) => row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(";"))
+      .join("\n");
+    const BOM = "\uFEFF";
+    const blob = new Blob([BOM + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `trabajos_taller_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const handleTareaChange = (codigo: string) => {
     setSelectedTarea(codigo);
@@ -181,9 +217,12 @@ export default function Home() {
 
   return (
     <main className="max-w-5xl mx-auto p-4 sm:p-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Taller - Registro de Trabajos
-      </h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">
+          Taller - Registro de Trabajos
+        </h1>
+        <p className="text-sm text-gray-500 mt-1 sm:mt-0 capitalize">{fechaHoy}</p>
+      </div>
 
       {/* Selector de Operario */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
@@ -362,12 +401,22 @@ export default function Home() {
 
       {/* Tabla de trabajos */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <h2 className="text-lg font-semibold text-gray-700 p-4 border-b">
-          Trabajos registrados
-          {selectedOperario && operarios.find((o) => o.id === Number(selectedOperario))
-            ? ` - ${operarios.find((o) => o.id === Number(selectedOperario))!.nombre}`
-            : " - Todos"}
-        </h2>
+        <div className="flex items-center justify-between p-4 border-b">
+          <h2 className="text-lg font-semibold text-gray-700">
+            Trabajos registrados
+            {selectedOperario && operarios.find((o) => o.id === Number(selectedOperario))
+              ? ` - ${operarios.find((o) => o.id === Number(selectedOperario))!.nombre}`
+              : " - Todos"}
+          </h2>
+          {trabajos.length > 0 && (
+            <button
+              onClick={exportarExcel}
+              className="bg-green-600 text-white px-4 py-1.5 rounded-md text-sm hover:bg-green-700 transition-colors"
+            >
+              Exportar Excel
+            </button>
+          )}
+        </div>
 
         {trabajos.length === 0 ? (
           <p className="p-4 text-gray-500 text-sm">No hay trabajos registrados</p>
