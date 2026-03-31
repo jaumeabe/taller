@@ -18,6 +18,59 @@ interface Trabajo {
   created_at: string;
 }
 
+interface Tarea {
+  codigo: string;
+  trabajo: string;
+  tiempo: number | string;
+  categoria: string;
+}
+
+const TAREAS: Tarea[] = [
+  // Reparación cubas y jaulas
+  { codigo: "R001", trabajo: "Cambiar aceite hidraulico", tiempo: 8, categoria: "Reparacion cubas y jaulas" },
+  { codigo: "R002", trabajo: "Cambiar ballestas", tiempo: 6, categoria: "Reparacion cubas y jaulas" },
+  { codigo: "R003", trabajo: "Cambiar pastillas 1 eje", tiempo: 1.5, categoria: "Reparacion cubas y jaulas" },
+  { codigo: "R004", trabajo: "Cambiar discos 1 eje", tiempo: 8, categoria: "Reparacion cubas y jaulas" },
+  { codigo: "R005", trabajo: "Cambiar bombona suspension", tiempo: 1, categoria: "Reparacion cubas y jaulas" },
+  { codigo: "R006", trabajo: "Cambiar casquillos sin fin", tiempo: 6, categoria: "Reparacion cubas y jaulas" },
+  { codigo: "R007", trabajo: "Cambiar 1 casquillo arrastre", tiempo: 6, categoria: "Reparacion cubas y jaulas" },
+  { codigo: "R008", trabajo: "Cambiar motor hidraulico", tiempo: 1.5, categoria: "Reparacion cubas y jaulas" },
+  { codigo: "R009", trabajo: "Soldar puertas jaula", tiempo: 0, categoria: "Reparacion cubas y jaulas" },
+  { codigo: "R010", trabajo: "Cambiar casquillo 1 eje", tiempo: 4, categoria: "Reparacion cubas y jaulas" },
+  { codigo: "R011", trabajo: "Cambiar amortiguador", tiempo: 1, categoria: "Reparacion cubas y jaulas" },
+  { codigo: "R012", trabajo: "Cambiar sirga ventas jaula", tiempo: 4, categoria: "Reparacion cubas y jaulas" },
+  { codigo: "R013", trabajo: "Cambiar baterias jaula", tiempo: 1, categoria: "Reparacion cubas y jaulas" },
+  { codigo: "R014", trabajo: "Varios en remolques", tiempo: "", categoria: "Reparacion cubas y jaulas" },
+  // Reparación tractoras
+  { codigo: "R015", trabajo: "Cambiar embrague", tiempo: 20, categoria: "Reparacion tractoras" },
+  { codigo: "R016", trabajo: "Cambiar alternador", tiempo: 1.5, categoria: "Reparacion tractoras" },
+  { codigo: "R017", trabajo: "Cambiar radiador motor", tiempo: 12, categoria: "Reparacion tractoras" },
+  { codigo: "R018", trabajo: "Cambiar turbocompresor", tiempo: 4, categoria: "Reparacion tractoras" },
+  { codigo: "R019", trabajo: "Cambiar bomba agua", tiempo: 5, categoria: "Reparacion tractoras" },
+  { codigo: "R020", trabajo: "Cambiar ventilador", tiempo: 5, categoria: "Reparacion tractoras" },
+  { codigo: "R021", trabajo: "Cambiar bomba combustible", tiempo: 3, categoria: "Reparacion tractoras" },
+  { codigo: "R022", trabajo: "Cambiar 6 inyectores", tiempo: 16, categoria: "Reparacion tractoras" },
+  { codigo: "R023", trabajo: "Cambiar correas", tiempo: 1.5, categoria: "Reparacion tractoras" },
+  { codigo: "R024", trabajo: "Cambiar motor de arranque", tiempo: 1.5, categoria: "Reparacion tractoras" },
+  { codigo: "R025", trabajo: "Cambiar pastillas en 1 eje", tiempo: 1.5, categoria: "Reparacion tractoras" },
+  { codigo: "R026", trabajo: "Cambiar casquillos traseros", tiempo: 4, categoria: "Reparacion tractoras" },
+  { codigo: "R027", trabajo: "Varios en tractoras", tiempo: "", categoria: "Reparacion tractoras" },
+  // Reparación vehículo ligero
+  { codigo: "R028", trabajo: "Cambiar neumaticos", tiempo: 1.5, categoria: "Reparacion vehiculo ligero" },
+  { codigo: "R029", trabajo: "Revision mantenimiento", tiempo: 1, categoria: "Reparacion vehiculo ligero" },
+  { codigo: "R030", trabajo: "Cambiar frenos", tiempo: 1.5, categoria: "Reparacion vehiculo ligero" },
+  { codigo: "R031", trabajo: "Cambiar embrague", tiempo: 8, categoria: "Reparacion vehiculo ligero" },
+  { codigo: "R032", trabajo: "Carga aire acondicionado", tiempo: 1, categoria: "Reparacion vehiculo ligero" },
+  { codigo: "R033", trabajo: "Cambiar amortiguador delantero", tiempo: 2, categoria: "Reparacion vehiculo ligero" },
+  { codigo: "R034", trabajo: "Revisar fallos electricos", tiempo: 0, categoria: "Reparacion vehiculo ligero" },
+  { codigo: "R035", trabajo: "Cambiar amortiguador trasero", tiempo: 1, categoria: "Reparacion vehiculo ligero" },
+  { codigo: "R036", trabajo: "Varios ligeros", tiempo: 0, categoria: "Reparacion vehiculo ligero" },
+  // Urgencias
+  { codigo: "RE040", trabajo: "SALIDA URGENCIA", tiempo: "", categoria: "Urgencias" },
+];
+
+const CATEGORIAS = [...new Set(TAREAS.map((t) => t.categoria))];
+
 export default function Home() {
   const [operarios, setOperarios] = useState<Operario[]>([]);
   const [selectedOperario, setSelectedOperario] = useState<string>("");
@@ -25,6 +78,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
+  const [selectedTarea, setSelectedTarea] = useState<string>("");
   const [form, setForm] = useState({
     trabajo: "",
     codigo: "",
@@ -58,6 +112,21 @@ export default function Home() {
     loadTrabajos();
   }, [loadTrabajos]);
 
+  const handleTareaChange = (codigo: string) => {
+    setSelectedTarea(codigo);
+    const tarea = TAREAS.find((t) => t.codigo === codigo);
+    if (tarea) {
+      setForm({
+        ...form,
+        trabajo: tarea.trabajo,
+        codigo: tarea.codigo,
+        tiempo: tarea.tiempo !== "" ? `${tarea.tiempo}h` : "",
+      });
+    } else {
+      setForm({ ...form, trabajo: "", codigo: "", tiempo: "" });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedOperario) {
@@ -80,6 +149,7 @@ export default function Home() {
 
       if (res.ok) {
         setForm({ trabajo: "", codigo: "", vehiculo: "", tiempo: "", observaciones: "" });
+        setSelectedTarea("");
         setMessage({ text: "Trabajo registrado correctamente", type: "success" });
         loadTrabajos();
       } else {
@@ -126,18 +196,27 @@ export default function Home() {
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div>
+            <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-600 mb-1">
                 Trabajo
               </label>
-              <input
-                type="text"
+              <select
+                value={selectedTarea}
+                onChange={(e) => handleTareaChange(e.target.value)}
                 required
-                value={form.trabajo}
-                onChange={(e) => setForm({ ...form, trabajo: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Descripción del trabajo"
-              />
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">-- Seleccionar trabajo --</option>
+                {CATEGORIAS.map((cat) => (
+                  <optgroup key={cat} label={cat}>
+                    {TAREAS.filter((t) => t.categoria === cat).map((t) => (
+                      <option key={t.codigo} value={t.codigo}>
+                        {t.codigo} - {t.trabajo}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -145,14 +224,23 @@ export default function Home() {
               </label>
               <input
                 type="text"
-                required
+                readOnly
                 value={form.codigo}
-                onChange={(e) => setForm({ ...form, codigo: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Código del trabajo"
+                className="w-full border border-gray-200 rounded-md px-3 py-2 bg-gray-50 text-gray-500"
               />
             </div>
             <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">
+                Tiempo estimado
+              </label>
+              <input
+                type="text"
+                readOnly
+                value={form.tiempo}
+                className="w-full border border-gray-200 rounded-md px-3 py-2 bg-gray-50 text-gray-500"
+              />
+            </div>
+            <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-600 mb-1">
                 Vehículo
               </label>
@@ -162,20 +250,7 @@ export default function Home() {
                 value={form.vehiculo}
                 onChange={(e) => setForm({ ...form, vehiculo: e.target.value })}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Matrícula o modelo"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Tiempo
-              </label>
-              <input
-                type="text"
-                required
-                value={form.tiempo}
-                onChange={(e) => setForm({ ...form, tiempo: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Ej: 2h 30min"
+                placeholder="Matrícula o modelo del vehículo"
               />
             </div>
           </div>
