@@ -31,6 +31,9 @@ export async function ensureTablesExist() {
       vehiculo VARCHAR(255) NOT NULL,
       tiempo VARCHAR(100) NOT NULL,
       observaciones TEXT DEFAULT '',
+      tiene_ayudante BOOLEAN DEFAULT FALSE,
+      ayudante VARCHAR(100) DEFAULT '',
+      horas_ayudante VARCHAR(50) DEFAULT '',
       created_at TIMESTAMP DEFAULT NOW()
     )
   `;
@@ -44,6 +47,11 @@ export async function ensureTablesExist() {
       ('Operario 3')
     `;
   }
+
+  // Add new columns if they don't exist (safe to run multiple times)
+  await sql`ALTER TABLE trabajos ADD COLUMN IF NOT EXISTS tiene_ayudante BOOLEAN DEFAULT FALSE`;
+  await sql`ALTER TABLE trabajos ADD COLUMN IF NOT EXISTS ayudante VARCHAR(100) DEFAULT ''`;
+  await sql`ALTER TABLE trabajos ADD COLUMN IF NOT EXISTS horas_ayudante VARCHAR(50) DEFAULT ''`;
 
   initialized = true;
 }
