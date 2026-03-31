@@ -242,7 +242,7 @@ export default function Home() {
         <select
           value={selectedOperario}
           onChange={(e) => setSelectedOperario(e.target.value)}
-          className="w-full sm:w-64 border border-gray-300 rounded-md px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full sm:w-64 border border-gray-300 rounded-lg px-3 py-3 sm:py-2 text-base sm:text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">-- Seleccionar operario --</option>
           {operarios.map((op) => (
@@ -412,7 +412,7 @@ export default function Home() {
       {/* Tabla de trabajos */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold text-gray-700">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-700">
             Trabajos registrados
             {selectedOperario && operarios.find((o) => o.id === Number(selectedOperario))
               ? ` - ${operarios.find((o) => o.id === Number(selectedOperario))!.nombre}`
@@ -421,7 +421,7 @@ export default function Home() {
           {trabajos.length > 0 && (
             <button
               onClick={exportarExcel}
-              className="bg-green-600 text-white px-4 py-1.5 rounded-md text-sm hover:bg-green-700 transition-colors"
+              className="bg-green-600 text-white px-3 py-1.5 rounded-md text-xs sm:text-sm hover:bg-green-700 transition-colors whitespace-nowrap"
             >
               Exportar Excel
             </button>
@@ -431,55 +431,110 @@ export default function Home() {
         {trabajos.length === 0 ? (
           <p className="p-4 text-gray-500 text-sm">No hay trabajos registrados</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-100 text-gray-600">
-                <tr>
-                  <th className="text-left px-4 py-3">Operario</th>
-                  <th className="text-left px-4 py-3">Trabajo</th>
-                  <th className="text-left px-4 py-3">Código</th>
-                  <th className="text-left px-4 py-3">Vehículo</th>
-                  <th className="text-left px-4 py-3">Tiempo</th>
-                  <th className="text-left px-4 py-3">Ayudante</th>
-                  <th className="text-left px-4 py-3">Observaciones</th>
-                  <th className="text-left px-4 py-3">Fecha</th>
-                  <th className="text-left px-4 py-3"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {trabajos.map((t) => (
-                  <tr key={t.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3">{t.operario}</td>
-                    <td className="px-4 py-3">{t.trabajo}</td>
-                    <td className="px-4 py-3">{t.codigo}</td>
-                    <td className="px-4 py-3">{t.vehiculo}</td>
-                    <td className="px-4 py-3">{t.tiempo}</td>
-                    <td className="px-4 py-3">
-                      {t.tiene_ayudante ? `${t.ayudante} (${t.horas_ayudante})` : "No"}
-                    </td>
-                    <td className="px-4 py-3 max-w-xs truncate">{t.observaciones}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      {new Date(t.created_at).toLocaleDateString("es-ES", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </td>
-                    <td className="px-4 py-3">
-                      <button
-                        onClick={() => handleDelete(t.id)}
-                        className="text-red-500 hover:text-red-700 text-sm font-medium"
-                      >
-                        Eliminar
-                      </button>
-                    </td>
+          <>
+            {/* Vista móvil: tarjetas */}
+            <div className="block sm:hidden divide-y divide-gray-100">
+              {trabajos.map((t) => (
+                <div key={t.id} className="p-4">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className="font-semibold text-gray-800">{t.trabajo}</p>
+                      <p className="text-xs text-gray-500">{t.codigo} - {t.operario}</p>
+                    </div>
+                    <button
+                      onClick={() => handleDelete(t.id)}
+                      className="text-red-500 hover:text-red-700 text-xs font-medium ml-2 shrink-0"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                    <div>
+                      <span className="text-gray-500">Vehículo: </span>
+                      <span className="text-gray-800">{t.vehiculo}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Tiempo: </span>
+                      <span className="text-gray-800">{t.tiempo}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Ayudante: </span>
+                      <span className="text-gray-800">
+                        {t.tiene_ayudante ? `${t.ayudante} (${t.horas_ayudante})` : "No"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Fecha: </span>
+                      <span className="text-gray-800">
+                        {new Date(t.created_at).toLocaleDateString("es-ES", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                  {t.observaciones && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      <span className="text-gray-400">Obs: </span>{t.observaciones}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Vista desktop: tabla */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-100 text-gray-600">
+                  <tr>
+                    <th className="text-left px-4 py-3">Operario</th>
+                    <th className="text-left px-4 py-3">Trabajo</th>
+                    <th className="text-left px-4 py-3">Código</th>
+                    <th className="text-left px-4 py-3">Vehículo</th>
+                    <th className="text-left px-4 py-3">Tiempo</th>
+                    <th className="text-left px-4 py-3">Ayudante</th>
+                    <th className="text-left px-4 py-3">Observaciones</th>
+                    <th className="text-left px-4 py-3">Fecha</th>
+                    <th className="text-left px-4 py-3"></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {trabajos.map((t) => (
+                    <tr key={t.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3">{t.operario}</td>
+                      <td className="px-4 py-3">{t.trabajo}</td>
+                      <td className="px-4 py-3">{t.codigo}</td>
+                      <td className="px-4 py-3">{t.vehiculo}</td>
+                      <td className="px-4 py-3">{t.tiempo}</td>
+                      <td className="px-4 py-3">
+                        {t.tiene_ayudante ? `${t.ayudante} (${t.horas_ayudante})` : "No"}
+                      </td>
+                      <td className="px-4 py-3 max-w-xs truncate">{t.observaciones}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        {new Date(t.created_at).toLocaleDateString("es-ES", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          onClick={() => handleDelete(t.id)}
+                          className="text-red-500 hover:text-red-700 text-sm font-medium"
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </main>
