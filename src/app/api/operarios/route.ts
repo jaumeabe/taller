@@ -1,8 +1,9 @@
-import { getDb } from "@/lib/db";
+import { getDb, ensureTablesExist } from "@/lib/db";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
+    await ensureTablesExist();
     const sql = getDb();
     const operarios = await sql`SELECT id, nombre FROM operarios ORDER BY nombre`;
     return NextResponse.json(operarios);

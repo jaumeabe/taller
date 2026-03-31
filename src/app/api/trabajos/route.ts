@@ -1,8 +1,9 @@
-import { getDb } from "@/lib/db";
+import { getDb, ensureTablesExist } from "@/lib/db";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   try {
+    await ensureTablesExist();
     const sql = getDb();
     const { searchParams } = new URL(request.url);
     const operarioId = searchParams.get("operario_id");
