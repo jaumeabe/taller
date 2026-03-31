@@ -14,6 +14,9 @@ interface Trabajo {
   vehiculo: string;
   tiempo: string;
   observaciones: string;
+  tiene_ayudante: boolean;
+  ayudante: string;
+  horas_ayudante: string;
   operario: string;
   created_at: string;
 }
@@ -71,6 +74,8 @@ const TAREAS: Tarea[] = [
 
 const CATEGORIAS = [...new Set(TAREAS.map((t) => t.categoria))];
 
+const AYUDANTES = ["Ayudante 1", "Ayudante 2", "Ayudante 3"];
+
 export default function Home() {
   const [operarios, setOperarios] = useState<Operario[]>([]);
   const [selectedOperario, setSelectedOperario] = useState<string>("");
@@ -79,12 +84,15 @@ export default function Home() {
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
   const [selectedTarea, setSelectedTarea] = useState<string>("");
+  const [tieneAyudante, setTieneAyudante] = useState(false);
   const [form, setForm] = useState({
     trabajo: "",
     codigo: "",
     vehiculo: "",
     tiempo: "",
     observaciones: "",
+    ayudante: "",
+    horas_ayudante: "",
   });
 
   useEffect(() => {
@@ -143,13 +151,21 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           operario_id: Number(selectedOperario),
-          ...form,
+          trabajo: form.trabajo,
+          codigo: form.codigo,
+          vehiculo: form.vehiculo,
+          tiempo: form.tiempo,
+          observaciones: form.observaciones,
+          tiene_ayudante: tieneAyudante,
+          ayudante: tieneAyudante ? form.ayudante : "",
+          horas_ayudante: tieneAyudante ? form.horas_ayudante : "",
         }),
       });
 
       if (res.ok) {
-        setForm({ trabajo: "", codigo: "", vehiculo: "", tiempo: "", observaciones: "" });
+        setForm({ trabajo: "", codigo: "", vehiculo: "", tiempo: "", observaciones: "", ayudante: "", horas_ayudante: "" });
         setSelectedTarea("");
+        setTieneAyudante(false);
         setMessage({ text: "Trabajo registrado correctamente", type: "success" });
         loadTrabajos();
       } else {
@@ -255,6 +271,60 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Ayudante */}
+          <div className="mb-4 p-3 border border-gray-200 rounded-md">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={tieneAyudante}
+                onChange={(e) => {
+                  setTieneAyudante(e.target.checked);
+                  if (!e.target.checked) {
+                    setForm({ ...form, ayudante: "", horas_ayudante: "" });
+                  }
+                }}
+                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+              />
+              <span className="text-sm font-medium text-gray-700">Con ayudante</span>
+            </label>
+
+            {tieneAyudante && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    Ayudante
+                  </label>
+                  <select
+                    value={form.ayudante}
+                    onChange={(e) => setForm({ ...form, ayudante: e.target.value })}
+                    required
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">-- Seleccionar ayudante --</option>
+                    {AYUDANTES.map((a) => (
+                      <option key={a} value={a}>
+                        {a}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    Horas del ayudante
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={form.horas_ayudante}
+                    onChange={(e) => setForm({ ...form, horas_ayudante: e.target.value })}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Ej: 4h"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-600 mb-1">
               Observaciones
@@ -311,6 +381,7 @@ export default function Home() {
                   <th className="text-left px-4 py-3">Código</th>
                   <th className="text-left px-4 py-3">Vehículo</th>
                   <th className="text-left px-4 py-3">Tiempo</th>
+                  <th className="text-left px-4 py-3">Ayudante</th>
                   <th className="text-left px-4 py-3">Observaciones</th>
                   <th className="text-left px-4 py-3">Fecha</th>
                 </tr>
@@ -323,6 +394,9 @@ export default function Home() {
                     <td className="px-4 py-3">{t.codigo}</td>
                     <td className="px-4 py-3">{t.vehiculo}</td>
                     <td className="px-4 py-3">{t.tiempo}</td>
+                    <td className="px-4 py-3">
+                      {t.tiene_ayudante ? `${t.ayudante} (${t.horas_ayudante})` : "No"}
+                    </td>
                     <td className="px-4 py-3 max-w-xs truncate">{t.observaciones}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       {new Date(t.created_at).toLocaleDateString("es-ES", {
