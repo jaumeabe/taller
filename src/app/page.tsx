@@ -156,6 +156,16 @@ export default function Home() {
     URL.revokeObjectURL(url);
   };
 
+  const handleDelete = async (id: number) => {
+    if (!confirm("¿Seguro que quieres eliminar este trabajo?")) return;
+    try {
+      const res = await fetch(`/api/trabajos?id=${id}`, { method: "DELETE" });
+      if (res.ok) {
+        loadTrabajos();
+      }
+    } catch {}
+  };
+
   const handleTareaChange = (codigo: string) => {
     setSelectedTarea(codigo);
     const tarea = TAREAS.find((t) => t.codigo === codigo);
@@ -433,6 +443,7 @@ export default function Home() {
                   <th className="text-left px-4 py-3">Ayudante</th>
                   <th className="text-left px-4 py-3">Observaciones</th>
                   <th className="text-left px-4 py-3">Fecha</th>
+                  <th className="text-left px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -455,6 +466,14 @@ export default function Home() {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => handleDelete(t.id)}
+                        className="text-red-500 hover:text-red-700 text-sm font-medium"
+                      >
+                        Eliminar
+                      </button>
                     </td>
                   </tr>
                 ))}
