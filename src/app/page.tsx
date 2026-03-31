@@ -131,17 +131,16 @@ export default function Home() {
 
   const exportarExcel = () => {
     if (trabajos.length === 0) return;
-    const headers = ["Operario", "Trabajo", "Código", "Vehículo", "Tiempo", "Ayudante", "Horas Ayudante", "Observaciones", "Fecha"];
+    const headers = ["Fecha", "Matrícula", "Operario", "Horas", "Ayudante", "Horas Ayudante", "Trabajo", "Observación"];
     const rows = trabajos.map((t) => [
-      t.operario,
-      t.trabajo,
-      t.codigo,
-      t.vehiculo,
-      t.tiempo,
-      t.tiene_ayudante ? t.ayudante : "No",
-      t.tiene_ayudante ? t.horas_ayudante : "",
-      t.observaciones,
       new Date(t.created_at).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }),
+      t.vehiculo,
+      t.operario,
+      t.tiempo,
+      t.tiene_ayudante ? t.ayudante : "",
+      t.tiene_ayudante ? t.horas_ayudante : "",
+      t.trabajo,
+      t.observaciones,
     ]);
     const csvContent = [headers, ...rows]
       .map((row) => row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(";"))
