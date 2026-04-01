@@ -74,7 +74,18 @@ const TAREAS: Tarea[] = [
 
 const CATEGORIAS = [...new Set(TAREAS.map((t) => t.categoria))];
 
-const AYUDANTES = ["Ayudante 1", "Ayudante 2", "Ayudante 3"];
+const STAFF_OFICIALES = [
+  "COSMIN VERES ANDREAS",
+  "DENIS RAZVAN VERES",
+  "PEETER UIBO",
+  "RICARDO MARTOS",
+  "SERGI JOSEP PINEDA",
+];
+
+const STAFF_AYUDANTES = [
+  "GREGOR UIBO",
+  "MOHAMED KESSARI",
+];
 
 export default function Home() {
   const [operarios, setOperarios] = useState<Operario[]>([]);
@@ -349,11 +360,20 @@ export default function Home() {
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">-- Seleccionar ayudante --</option>
-                    {AYUDANTES.map((a) => (
-                      <option key={a} value={a}>
-                        {a}
-                      </option>
-                    ))}
+                    <optgroup label="Oficiales">
+                      {STAFF_OFICIALES.map((a) => (
+                        <option key={a} value={a}>
+                          {a}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Ayudantes">
+                      {STAFF_AYUDANTES.map((a) => (
+                        <option key={a} value={a}>
+                          {a}
+                        </option>
+                      ))}
+                    </optgroup>
                   </select>
                 </div>
                 <div>
