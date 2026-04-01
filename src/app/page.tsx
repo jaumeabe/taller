@@ -74,7 +74,7 @@ const TAREAS: Tarea[] = [
 
 const CATEGORIAS = [...new Set(TAREAS.map((t) => t.categoria))];
 
-const AYUDANTES = ["Ayudante 1", "Ayudante 2", "Ayudante 3"];
+const AYUDANTES = ["GREGOR UIBO", "MOHAMED KESSARI"];
 
 export default function Home() {
   const [operarios, setOperarios] = useState<Operario[]>([]);
@@ -236,14 +236,14 @@ export default function Home() {
       {/* Selector de Operario */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
         <label className="block text-sm font-semibold text-gray-700 mb-2">
-          Operario
+          Oficial
         </label>
         <select
           value={selectedOperario}
           onChange={(e) => setSelectedOperario(e.target.value)}
           className="w-full sm:w-64 border border-gray-300 rounded-lg px-3 py-3 sm:py-2 text-base sm:text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="">-- Seleccionar operario --</option>
+          <option value="">-- Seleccionar oficial --</option>
           {operarios.map((op) => (
             <option key={op.id} value={op.id}>
               {op.nombre}

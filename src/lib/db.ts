@@ -38,15 +38,16 @@ export async function ensureTablesExist() {
     )
   `;
 
-  const existing = await sql`SELECT COUNT(*) as count FROM operarios`;
-  if (Number(existing[0].count) === 0) {
-    await sql`
-      INSERT INTO operarios (nombre) VALUES
-      ('Operario 1'),
-      ('Operario 2'),
-      ('Operario 3')
-    `;
-  }
+  // Reset operarios with current team
+  await sql`DELETE FROM operarios`;
+  await sql`
+    INSERT INTO operarios (nombre) VALUES
+    ('COSMIN VERES ANDREAS'),
+    ('DENIS RAZVAN VERES'),
+    ('PEETER UIBO'),
+    ('RICARDO MARTOS'),
+    ('SERGI JOSEP PINEDA')
+  `;
 
   // Add new columns if they don't exist (safe to run multiple times)
   await sql`ALTER TABLE trabajos ADD COLUMN IF NOT EXISTS tiene_ayudante BOOLEAN DEFAULT FALSE`;
