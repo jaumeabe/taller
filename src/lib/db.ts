@@ -39,7 +39,7 @@ export async function ensureTablesExist() {
   `;
 
   // Reset operarios with current team
-  await sql`DELETE FROM operarios`;
+  await sql`TRUNCATE TABLE operarios CASCADE`;
   await sql`
     INSERT INTO operarios (nombre) VALUES
     ('COSMIN VERES ANDREAS'),

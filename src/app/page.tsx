@@ -236,14 +236,14 @@ export default function Home() {
       {/* Selector de Operario */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
         <label className="block text-sm font-semibold text-gray-700 mb-2">
-          Oficial
+          Operario
         </label>
         <select
           value={selectedOperario}
           onChange={(e) => setSelectedOperario(e.target.value)}
           className="w-full sm:w-64 border border-gray-300 rounded-lg px-3 py-3 sm:py-2 text-base sm:text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="">-- Seleccionar oficial --</option>
+          <option value="">-- Seleccionar operario --</option>
           {operarios.map((op) => (
             <option key={op.id} value={op.id}>
               {op.nombre}
