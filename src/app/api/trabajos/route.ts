@@ -66,3 +66,23 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const sql = getDb();
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({ error: "ID es obligatorio" }, { status: 400 });
+    }
+
+    await sql`DELETE FROM trabajos WHERE id = ${Number(id)}`;
+    return NextResponse.json({ message: "Trabajo eliminado" });
+  } catch {
+    return NextResponse.json(
+      { error: "Error al eliminar trabajo" },
+      { status: 500 }
+    );
+  }
+}
