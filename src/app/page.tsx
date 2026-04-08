@@ -75,7 +75,7 @@ const TAREAS: Tarea[] = [
 
 const CATEGORIAS = [...new Set(TAREAS.map((t) => t.categoria))];
 
-const AYUDANTES = ["Ayudante 1", "Ayudante 2", "Ayudante 3"];
+const AYUDANTES = ["GREGOR UIBO", "MOHAMED KESSARI"];
 
 export default function Home() {
   const [operarios, setOperarios] = useState<Operario[]>([]);
