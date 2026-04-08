@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { MATRICULAS } from "@/lib/matriculas";
 
 interface Operario {
   id: number;
@@ -156,14 +157,19 @@ export default function Home() {
               <label className="block text-sm font-medium text-gray-600 mb-1">
                 Vehículo
               </label>
-              <input
-                type="text"
+              <select
                 required
                 value={form.vehiculo}
                 onChange={(e) => setForm({ ...form, vehiculo: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Matrícula o modelo"
-              />
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">-- Seleccionar vehículo --</option>
+                {MATRICULAS.map((m) => (
+                  <option key={m.id} value={`${m.camion} - ${m.matricula}`}>
+                    {m.camion} - {m.matricula}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
