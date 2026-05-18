@@ -1,3 +1,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Prevent iOS zoom on input focus */
+@media screen and (max-width: 640px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Better touch targets on mobile */
+@media (pointer: coarse) {
+  button, select, input, textarea {
+    min-height: 44px;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  -webkit-overflow-scrolling: touch;
+}
