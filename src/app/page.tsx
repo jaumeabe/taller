@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { MATRICULAS } from "@/lib/matriculas";
+import { MATRICULAS, MATRICULAS_LIGERAS } from "@/lib/matriculas";
 
 interface Operario {
   id: number;
@@ -175,9 +175,10 @@ export default function Home() {
         trabajo: tarea.trabajo,
         codigo: tarea.codigo,
         tiempo: tarea.tiempo !== "" ? `${tarea.tiempo}h` : "",
+        vehiculo: "",
       });
     } else {
-      setForm({ ...form, trabajo: "", codigo: "", tiempo: "" });
+      setForm({ ...form, trabajo: "", codigo: "", tiempo: "", vehiculo: "" });
     }
   };
 
@@ -296,13 +297,15 @@ export default function Home() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
-                Tiempo estimado
+                Horas de trabajo
               </label>
               <input
                 type="text"
-                readOnly
+                required
                 value={form.tiempo}
-                className="w-full border border-gray-200 rounded-md px-3 py-2 bg-gray-50 text-gray-500"
+                onChange={(e) => setForm({ ...form, tiempo: e.target.value })}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Ej: 4h"
               />
             </div>
             <div className="sm:col-span-2">
@@ -316,11 +319,43 @@ export default function Home() {
                 className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">-- Seleccionar vehículo --</option>
-                {MATRICULAS.map((m) => (
-                  <option key={m.id} value={`${m.camion} - ${m.matricula}`}>
-                    {m.camion} - {m.matricula}
-                  </option>
-                ))}
+                {(() => {
+                  const tareaSeleccionada = TAREAS.find((t) => t.codigo === selectedTarea);
+                  const esLigero = tareaSeleccionada?.categoria === "Reparacion vehiculo ligero";
+                  const esUrgencia = tareaSeleccionada?.categoria === "Urgencias";
+                  if (esUrgencia) {
+                    return (
+                      <>
+                        <optgroup label="Vehículos pesados">
+                          {MATRICULAS.map((m) => (
+                            <option key={m.id} value={`${m.camion} - ${m.matricula}`}>
+                              {m.camion} - {m.matricula}
+                            </option>
+                          ))}
+                        </optgroup>
+                        <optgroup label="Vehículos ligeros">
+                          {MATRICULAS_LIGERAS.map((m) => (
+                            <option key={m.id} value={`${m.vehiculo} - ${m.descripcion}`}>
+                              {m.vehiculo} - {m.descripcion}
+                            </option>
+                          ))}
+                        </optgroup>
+                      </>
+                    );
+                  }
+                  if (esLigero) {
+                    return MATRICULAS_LIGERAS.map((m) => (
+                      <option key={m.id} value={`${m.vehiculo} - ${m.descripcion}`}>
+                        {m.vehiculo} - {m.descripcion}
+                      </option>
+                    ));
+                  }
+                  return MATRICULAS.map((m) => (
+                    <option key={m.id} value={`${m.camion} - ${m.matricula}`}>
+                      {m.camion} - {m.matricula}
+                    </option>
+                  ));
+                })()}
               </select>
             </div>
           </div>
